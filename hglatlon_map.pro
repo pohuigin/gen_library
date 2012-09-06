@@ -2,11 +2,9 @@
 ;HGLATMAP - output latitude map
 ;imgsz=size(image_array)
 ;dxdy=[map.dx,map.dy]
-;oflb -> output of offlimb pixels
-;mdi -> restore mdi imgsz, dxdy
 ;TIME=TIME - map.time
 
-pro hglatlon_map, hglonmap,hglatmap, dxdy, imgsz, oflb, time=date, plot=plot, mdi=mdi
+pro hglatlon_map, hglonmap,hglatmap, dxdy, imgsz, oflb, time=date, plot=plot
 
 ;rtgetcarposondisk,pixpos,carlonlat,flagintersection,imsize=imsize,$
 ;  fovpix=fovpix,$
@@ -43,11 +41,6 @@ pro hglatlon_map, hglonmap,hglatmap, dxdy, imgsz, oflb, time=date, plot=plot, md
 ;;
 ;stop;
 
-if keyword_set(mdi) then begin
-	imgsz=[2,1024,1024]
-	dxdy=[1.98403,1.98403]
-endif
-
 hglatmap=fltarr(imgsz[1],imgsz[2])
 hglonmap=fltarr(imgsz[1],imgsz[2])
 
@@ -64,9 +57,6 @@ oflb=reform(oflb,imgsz[1],imgsz[2])
 woff=where(oflb eq 1)
 hglonmap[woff]=-10d3
 hglatmap[woff]=-10d3
-
-if (where(finite(hglonmap) ne 1))[0] ne -1 then hglonmap[where(finite(hglonmap) ne 1)]=-10d3
-if (where(finite(hglatmap) ne 1))[0] ne -1 then hglatmap[where(finite(hglatmap) ne 1)]=-10d3
 
 if keyword_set(plot) then begin
 	phglonmap=hglonmap
