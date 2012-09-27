@@ -1,5 +1,5 @@
 pro setplotenv, xwin=xwin, psfile=psfile, default=default, filename=filename, $
-                xs=xs, ys=ys, sys=sys, _extra=_extra,silent=silent
+                xs=xs, ys=ys, sys=sys, _extra=_extra,silent=silent, nowindow=nowindow
 
 if not keyword_set(sys) then nocolors=1
 
@@ -20,10 +20,12 @@ if keyword_set(default) then begin
 endif
 
 if keyword_set(xwin) then begin
-	if keyword_set(_extra) then window, 8, retain=2, _extra=_extra else begin
-		window, 8,xsize=800,ysize=600, retain=2
-		wset, 8
-	endelse
+	if not keyword_set(nowindow) then begin
+		if keyword_set(_extra) then window, 8, retain=2, _extra=_extra else begin
+			window, 8,xsize=800,ysize=600, retain=2
+			wset, 8
+		endelse
+	endif
 
 	!x.thick = 2
 	!y.thick = 2
