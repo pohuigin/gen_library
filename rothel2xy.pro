@@ -34,10 +34,12 @@
 ;	      
 ;
 ; AUTHOR:     20-oct-2000, P. T. Gallagher (ptg@bbso.njit.edu)
-;
+;             09-mar-2013, P. A. Higgins (pohuigin@gmail.com)
+;                          Added /MMMOTD_PRINT to print output in MMMOTD format.
 ;-
 
-pro rothel2xy, hel_start, t_start, t_end, hel_end, xy_start, xy_end, print = print
+pro rothel2xy, hel_start, t_start, t_end, hel_end, xy_start, xy_end, $
+	print = print, mmmotd_print=mmmotd_print
 
 ; If hel_start is only entered, then set get the current time
 ; and set to t_start and t_end
@@ -92,6 +94,14 @@ pro rothel2xy, hel_start, t_start, t_end, hel_end, xy_start, xy_end, print = pri
              '"' + ', ' + xy_end( 1 ) + '")'
     endif
     print, ' ' 
+  endif
+
+  if ( keyword_set( mmmotd_print ) ) then begin
+    print, ' ' 
+    print, 'The position of NOAA ????? on ' + anytim(t_start,/vms,/date) + ' at ' + anytim(t_start,/vms,/time) + 'UT is: ' + hel_start + ', ' + '( ' + xy_start(0) + '"' + ', ' + xy_start( 1 ) + '" )'
+    if ( n_elements( current_time ) eq 0 ) then $
+        print, 'The position of NOAA ????? on ' + anytim(t_end,/vms,/date) + ' at ' + anytim(t_end,/vms,/time) + 'UT is: ' + hel_end(0) + hel_end(1)+', ' + '( ' + xy_end(0) + '"' + ', ' + xy_end( 1 ) + '" )'
+    print, ' '
   endif
   
 ; Bad programming to deal with rothel2xy, 'N12W12', xy_end
