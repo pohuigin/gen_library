@@ -1,6 +1,8 @@
 ;plot a magnetogram including image scaling and a color bar
 ;UNITS = the units to show on the colorbar title (e.g., '[G]')
-pro plot_mag, image, _extra=_extra, units=units, colorbar=colorbar
+pro plot_mag, inimage, _extra=_extra, units=units, colorbar=colorbar
+
+image=inimage
 
 if data_type(image) eq 8 then begin
 	image.data=magscl(image.data, _extra=_extra)
