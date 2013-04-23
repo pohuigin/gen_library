@@ -12,17 +12,19 @@ if n_elements(indata) gt 0 then dodata=1 else dodata=0
 
 if dodata then data=indata else data=map.data
 
+maptag=strlowcase(tag_names(map))
+
 if keyword_set(rebin1k) then begin	
 ;Reduce resolution to 1kx1k
 	data=rebin(data,1024,1024) ;reduce resolution using neighborhood averaging
-	map.CRPIX1=map.CRPIX1/4.
-	map.CRPIX2=map.CRPIX2/4.
+	if (where(maptag eq 'crpix1'))[0] ne -1 then map.CRPIX1=map.CRPIX1/4.
+	if (where(maptag eq 'crpix2'))[0] ne -1 then map.CRPIX2=map.CRPIX2/4.
 ;		index.CRVAL1=???
 ;		index.CRVAL2=???
-	map.CDELT1=map.CDELT1*4.
-	map.CDELT2=map.CDELT2*4.
-	map.NAXIS1=map.NAXIS1/4.
-	map.NAXIS2=map.NAXIS2/4.
+	if (where(maptag eq 'cdelt1'))[0] ne -1 then map.CDELT1=map.CDELT1*4.
+	if (where(maptag eq 'cdelt2'))[0] ne -1 then map.CDELT2=map.CDELT2*4.
+	if (where(maptag eq 'naxis1'))[0] ne -1 then map.NAXIS1=map.NAXIS1/4.
+	if (where(maptag eq 'naxis2'))[0] ne -1 then map.NAXIS2=map.NAXIS2/4.
 	if not dodata then begin 
 		map.xc=map.xc/4.
 		map.yc=map.yc/4.
@@ -40,14 +42,14 @@ if keyword_set(xy) then begin
 	xfrac=float(sz[0])/float(xy[0])
 	yfrac=float(sz[0])/float(xy[0])
 
-	map.CRPIX1=map.CRPIX1/xfrac
-	map.CRPIX2=map.CRPIX2/yfrac
+	if (where(maptag eq 'crpix1'))[0] ne -1 then map.CRPIX1=map.CRPIX1/xfrac
+	if (where(maptag eq 'crpix2'))[0] ne -1 then map.CRPIX2=map.CRPIX2/yfrac
 ;		index.CRVAL1=???
 ;		index.CRVAL2=???
-	map.CDELT1=map.CDELT1*xfrac
-	map.CDELT2=map.CDELT2*yfrac
-	map.NAXIS1=map.NAXIS1/xfrac
-	map.NAXIS2=map.NAXIS2/yfrac
+	if (where(maptag eq 'cdelt1'))[0] ne -1 then map.CDELT1=map.CDELT1*xfrac
+	if (where(maptag eq 'cdelt2'))[0] ne -1 then map.CDELT2=map.CDELT2*yfrac
+	if (where(maptag eq 'naxis1'))[0] ne -1 then map.NAXIS1=map.NAXIS1/xfrac
+	if (where(maptag eq 'naxis2'))[0] ne -1 then map.NAXIS2=map.NAXIS2/yfrac
 	if not dodata then begin 
 		map.xc=map.xc/xfrac
 		map.yc=map.yc/yfrac
@@ -60,14 +62,14 @@ endif
 if n_elements(reducexy) eq 2 then begin
 	data=reduce(map.data,reducexy[0],reducexy[1],/average)
 	
-	map.CRPIX1=map.CRPIX1/reducexy[0]
-	map.CRPIX2=map.CRPIX2/reducexy[1]
+	if (where(maptag eq 'crpix1'))[0] ne -1 then map.CRPIX1=map.CRPIX1/reducexy[0]
+	if (where(maptag eq 'crpix2'))[0] ne -1 then map.CRPIX2=map.CRPIX2/reducexy[1]
 ;		index.CRVAL1=???
 ;		index.CRVAL2=???
-	map.CDELT1=map.CDELT1*reducexy[0]
-	map.CDELT2=map.CDELT2*reducexy[1]
-	map.NAXIS1=map.NAXIS1/reducexy[0]
-	map.NAXIS2=map.NAXIS2/reducexy[1]
+	if (where(maptag eq 'cdelt1'))[0] ne -1 then map.CDELT1=map.CDELT1*reducexy[0]
+	if (where(maptag eq 'cdelt2'))[0] ne -1 then map.CDELT2=map.CDELT2*reducexy[1]
+	if (where(maptag eq 'naxis1'))[0] ne -1 then map.NAXIS1=map.NAXIS1/reducexy[0]
+	if (where(maptag eq 'naxis2'))[0] ne -1 then map.NAXIS2=map.NAXIS2/reducexy[1]
 	if not dodata then begin 
 		map.xc=map.xc/reducexy[0]
 		map.yc=map.yc/reducexy[1]

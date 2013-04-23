@@ -24,7 +24,7 @@ nlonlat=nlonlat*!dtor
 da=acos(cos(alonlat[0,*]-nlonlat[0,*])*cos(alonlat[1,*]))
 outda=da/!dtor
 
-da2=atan(tan(alonlat[0,*]-nlonlat[0,*])/cos(inc))
+;da2=atan(tan(alonlat[0,*]-nlonlat[0,*])/cos(inc))
 
 ;if there is no second reference point input, then just output the distance of A to the node, N
 if not isb then return,outda
@@ -34,7 +34,20 @@ db=acos(cos(blonlat[0,*]-nlonlat[0,*])*cos(blonlat[1,*]))
 ;db2=atan(tan(blonlat[0,*]-nlonlat[0,*])/cos(inc))
 
 ;distance between the two points
-dd=abs(da-db)
+alatsign=alonlat[1,*]/abs(alonlat[1,*])
+blatsign=blonlat[1,*]/abs(blonlat[1,*])
+diffhemisign=alatsign*blatsign
+
+dd=abs(da-db*diffhemisign)
+
+
+;print,'da=',outda
+;print,'db=',db/!dtor
+;print,'dd=',dd/!dtor
+;stop
+
+
+
 
 ;dd2=abs(da2-db2)
 
