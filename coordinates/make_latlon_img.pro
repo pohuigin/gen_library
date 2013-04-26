@@ -2,7 +2,7 @@
 
 ;Re-map images to a Lat-Lon grid
 ;setting NOREMAP just returns the averaged magnetogram and nothing else.
-function make_latlon_img, infiles, mag=setmag, posmag=setpos, negmag=setneg, $
+function make_latlon_img, infiles, map=inmap, mag=setmag, posmag=setpos, negmag=setneg, $
 	euv=seteuv, tmid=tmid, logscale=logscale, missval=missval, $
 	latbin=latbin, lonbin=lonbin, lonbound=lonbound, latbound=latbound, $
 	setrebin=setrebin, rebinfact=rebinfact, dofilter=dofilter, $
@@ -13,20 +13,28 @@ rsunmm=695.5 ;radius of sun in Mm
 radpasec=2.*!pi/(360.*3600.)
 missval=-9999.
 
-ff=infiles
-nff=n_elements(ff)
+if n_elements(inmap) gt 0 and data_type(inmap) eq 8 then begin
 
-for j=0,nff-1 do begin
+	map_arr=inmap
 
-	if keyword_set(seteuv) then map=make_butterfly_euv(ff[j], logscale=logscale, index=outind)
+endif else begin
 
-	if keyword_set(setmag) then map=make_butterfly_mag(ff[j], index=outind, dofilter=dofilter)
+	ff=infiles
+	nff=n_elements(ff)
 
-	if j eq 0 then map_arr=map else map_arr=[map_arr,map]
+	for j=0,nff-1 do begin
 
-endfor
+		if keyword_set(seteuv) then map=make_butterfly_euv(ff[j], logscale=logscale, index=outind)
 
-inindex=outind
+		if keyword_set(setmag) then map=make_butterfly_mag(ff[j], index=outind, dofilter=dofilter)
+
+		if j eq 0 then map_arr=map else map_arr=[map_arr,map]
+
+	endfor
+
+	inindex=outind
+
+endelse
 
 map_rot=drot_map(map_arr,time=anytim(tmid,/vms), miss=missval)
 
@@ -56,7 +64,8 @@ lat = replicate(1,projdim[0]) # (findgen(projdim[1])*latbin+projlim[2])
 projmask=fltarr(projdim[0],projdim[1])+1.
 
 ;Create World Coordinate System structure
-wcs = fitshead2wcs( inindex )
+if data_type(inindex) ne 8 then wcs = fitshead2wcs( map_rot ) $
+	else wcs = fitshead2wcs( inindex )
 COORD = WCS_GET_COORD(WCS)
 
 ;Assume image rotation is 0 degrees
@@ -112,6 +121,7 @@ if keyword_set(setrebin) then begin
 	if keyword_set(setmag) then fluxmaprb=reduce(fluxmap,binfactor,binfactor,/average,miss=missval)
 endif else begin
 	imgavgrb=imgavg
+	if n_elements(fluxmap) eq 0 then fluxmap=imgavg
 	fluxmaprb=fluxmap
 endelse
 undefine,COORD
