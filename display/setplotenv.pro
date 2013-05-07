@@ -1,5 +1,8 @@
+;cleanfont - for PS plotting: no bold, arial, smaller character size
+
 pro setplotenv, xwin=xwin, psfile=psfile, default=default, filename=filename, $
-                xs=xs, ys=ys, sys=sys, _extra=_extra,silent=silent, nowindow=nowindow
+                xs=xs, ys=ys, sys=sys, _extra=_extra,silent=silent, nowindow=nowindow, $
+                cleanfont=cleanfont
 
 if not keyword_set(sys) then nocolors=1
 
@@ -60,9 +63,16 @@ if keyword_set(psfile) then begin
 ;		encapsulate=encapsulate, _extra=_extra
 
 	if keyword_set(filename) then begin
-		if keyword_set(nofont) then psopen,filename, /inch, /encapsulate, xs=xs, ys=ys, _extra=_extra, /color,font=-1 $
-			else psopen,filename, /bold, /inch, /encapsulate, xs=xs, ys=ys, _extra=_extra, /color,/helvetica;, /times
+		if keyword_set(cleanfont) then begin
+			
+			psopen,filename, /inch, /encapsulate, xs=xs, ys=ys, _extra=_extra, /color, /helvetica
+		endif else begin
+			if keyword_set(nofont) then psopen,filename, /inch, /encapsulate, xs=xs, ys=ys, _extra=_extra, /color,font=-1 $
+				else psopen,filename, /bold, /inch, /encapsulate, xs=xs, ys=ys, _extra=_extra, /color, /times
+		endelse
+
 		setcolors,nocolors=nocolors,sys=sys,silent=silent
+
 	endif
 
 
