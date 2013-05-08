@@ -10,7 +10,7 @@ function make_latlon_img, infiles, map=inmap, auxmap=inauxmap, $
 	outfluxmap=outfluxmap, outmask=projmask, outhg=hgcoord, outavgimg=avgimg, outaux=outaux, $
 	noremap=noremap
 
-rsunmm=695.5 ;radius of sun in Mm
+rsunmm=wcs_rsun(units='Mm') ;695.5 ;radius of sun in Mm
 radpasec=2.*!pi/(360.*3600.)
 missval=-9999.
 
@@ -81,7 +81,7 @@ rr=(xx^(2.)+yy^(2.))^(.5)
 
 ;Get radius of Sun in arcsecs, particular to the data source
 dsunmm=wcs.position.DSUN_OBS/1d6 ;put dist. to sun in Mm
-rsunmm=WCS_RSUN(units='Mm') ;radius of sun in Mm
+;rsunmm=WCS_RSUN(units='Mm') ;radius of sun in Mm
 rsunasec=atan(rsunmm/dsunmm)/radpasec
 
 ;stop
