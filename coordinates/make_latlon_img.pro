@@ -67,8 +67,11 @@ lat = replicate(1,projdim[0]) # (findgen(projdim[1])*latbin+projlim[2])
 projmask=fltarr(projdim[0],projdim[1])+1.
 
 ;Create World Coordinate System structure
-if data_type(inindex) ne 8 then wcs = fitshead2wcs( map_rot ) $
-	else wcs = fitshead2wcs( inindex )
+if where(strlowcase(tag_names(map_rot)) eq 'wcs') eq -1 then begin
+	if data_type(inindex) ne 8 then wcs = fitshead2wcs( map_rot.index ) $
+		else wcs = fitshead2wcs( inindex )
+endif else wcs=map_rot.wcs
+
 COORD = WCS_GET_COORD(WCS)
 
 ;Assume image rotation is 0 degrees
@@ -135,6 +138,7 @@ undefine,COORD
 ;Remap image to Lat-Lon grid 
 ;wcs_convert_to_coord, wcs, coord, ’HG’, lon, lat
 HGLN=lon & HGLT=lat
+
 WCS_CONVERT_TO_COORD, WCS, COORD, 'HG', HGLN, HGLT
 pixel = wcs_get_pixel( wcs, coord )
 proj = reform( interpolate( imgavgrb, pixel[0,*,*], pixel[1,*,*] ))

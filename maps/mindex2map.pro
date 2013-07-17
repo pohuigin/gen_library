@@ -17,6 +17,9 @@
 ; KEYWORDS:   	
 ;				QUIET		- Do not print the EXECUTE() errors to the terminal.
 ;
+;				NEST		- Instead of merging the FITS index with the MAP, nest the 
+;							  index as a MAP keyword
+;
 ; OUTPUT:    
 ;   	    	MAP			- The output (Zarro) image map structure with a complete 
 ;							FITS header.  
@@ -36,7 +39,7 @@
 ;-
 ;---------------------------------------------------------------------->
 
-pro mindex2map, inindex, indata, outmap, quiet=quiet
+pro mindex2map, inindex, indata, outmap, quiet=quiet, nest=nest
 
 if keyword_set(quiet) then begin & doquiet1=1 & doquiet2=1 & endif else begin 
 	doquiet1=0 & doquiet2=0 & endelse
@@ -44,7 +47,9 @@ if keyword_set(quiet) then begin & doquiet1=1 & doquiet2=1 & endif else begin
 data=indata
 index=inindex
 
-index2map,index,data,map
+wcs=fitshead2wcs(index)
+
+wcs2map,data,wcs,map
 
 ;Find if there are any overlapping tag names (keep the map one if overlap is found)
 mtags=tag_names(map)
@@ -59,6 +64,70 @@ match,mtags,itags,wm,wi
 ntag=n_elements(mtags)
 nitag=n_elements(itags)
 
+;using add_prop--------------------------------------------------------------->
+if keyword_set(nest) then begin
+	add_prop,map,index=index 
+	add_prop,map,wcs=wcs 
+endif else begin
+;using create_struct---------------------------------------------------------->
+
+	if ntag gt 50 then begin
+	
+		niter=ntag/50
+		if ntag mod 50 gt 0 then niter=niter+1
+	
+		for j=0,niter-1 do begin
+		
+		;Check for repeated tag names
+			indtag=0
+			thisrng=[j*50, ((j*50+50-1) < (ntag-1))]
+			for i=thisrng[0], thisrng[1] do $
+				if (where(wm eq i))[0] eq -1 then indtag=[indtag,i]
+			indtag=indtag[1:*]
+			ngood=n_elements(indtag)
+			
+			exstr='index=create_struct('+strjoin( $
+				strarr(ngood)+'mtags['+strtrim(indtag,2)+'],'+ $
+				strarr(ngood)+'map.('+strtrim(indtag,2)+'),','')+' index)'
+			status=execute(exstr)
+		
+		endfor
+	
+		map=index
+	
+	endif else begin
+	
+	;Check for repeated tag names
+		indtag=0
+		for i=0,ntag-1 do $
+			if (where(wm eq i))[0] eq -1 then indtag=[indtag,i]
+		indtag=indtag[1:*]
+		ngood=n_elements(indtag)
+		
+		exstr='map=create_struct('+strjoin( $
+			strarr(ngood)+'mtags['+strtrim(indtag,2)+'],'+ $
+			strarr(ngood)+'map.('+strtrim(indtag,2)+'),','')+' index)'
+		status=execute(exstr)
+	
+	endelse
+
+endelse
+
+
+outmap=map
+
+return
+
+
+
+
+
+
+
+
+
+
+;creating structure from scratch---------------------------------------------->
 ;Check for repeated tag names
 indtag=0
 for i=0,ntag-1 do $
@@ -78,21 +147,10 @@ exstr='map2={'+strmap+','+strind+'}'
 
 status=execute(exstr)
 
-outmap=map2
+stop
 
-return
-
-
-
-
-
-
-
-
-
-
-;using str_merge-------------------------------------------------------------->
-;map2=str_merge(index,map,/down)
+;using str_merge--------------------------------------------------------------->
+map2=str_merge(index,map,/down)
 
 stop
 
@@ -107,46 +165,6 @@ stop
 ;outmap=map2
 ;return
 
-;using create_struct---------------------------------------------------------->
-if ntag gt 50 then begin
-
-	niter=ntag/50
-	if ntag mod 50 gt 0 then niter=niter+1
-
-	for j=0,niter-1 do begin
-	
-	;Check for repeated tag names
-		indtag=0
-		thisrng=[j*50, ((j*50+50-1) < (ntag-1))]
-		for i=thisrng[0], thisrng[1] do $
-			if (where(wm eq i))[0] eq -1 then indtag=[indtag,i]
-		indtag=indtag[1:*]
-		ngood=n_elements(indtag)
-		
-		exstr='index=create_struct('+strjoin( $
-			strarr(ngood)+'mtags['+strtrim(indtag,2)+'],'+ $
-			strarr(ngood)+'map.('+strtrim(indtag,2)+'),','')+' index)'
-		status=execute(exstr)
-	
-	endfor
-
-	map=index
-
-endif else begin
-
-;Check for repeated tag names
-	indtag=0
-	for i=0,ntag-1 do $
-		if (where(wm eq i))[0] eq -1 then indtag=[indtag,i]
-	indtag=indtag[1:*]
-	ngood=n_elements(indtag)
-	
-	exstr='map=create_struct('+strjoin( $
-		strarr(ngood)+'mtags['+strtrim(indtag,2)+'],'+ $
-		strarr(ngood)+'map.('+strtrim(indtag,2)+'),','')+' index)'
-	status=execute(exstr)
-
-endelse
 
 ;for i=0,ntags-1 do begin
 ;	exstring='add_prop,map,'+tags[i]+'=index.(i)'

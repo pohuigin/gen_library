@@ -17,20 +17,27 @@ maptag=strlowcase(tag_names(map))
 if keyword_set(rebin1k) then begin	
 ;Reduce resolution to 1kx1k
 	data=rebin(data,1024,1024) ;reduce resolution using neighborhood averaging
-	if (where(maptag eq 'crpix1'))[0] ne -1 then map.CRPIX1=map.CRPIX1/4.
-	if (where(maptag eq 'crpix2'))[0] ne -1 then map.CRPIX2=map.CRPIX2/4.
+	if (where(maptag eq 'crpix1'))[0] ne -1 then map.CRPIX1=map.index.CRPIX1/4.
+	if (where(maptag eq 'crpix2'))[0] ne -1 then map.CRPIX2=map.index.CRPIX2/4.
 ;		index.CRVAL1=???
 ;		index.CRVAL2=???
-	if (where(maptag eq 'cdelt1'))[0] ne -1 then map.CDELT1=map.CDELT1*4.
-	if (where(maptag eq 'cdelt2'))[0] ne -1 then map.CDELT2=map.CDELT2*4.
-	if (where(maptag eq 'naxis1'))[0] ne -1 then map.NAXIS1=map.NAXIS1/4.
-	if (where(maptag eq 'naxis2'))[0] ne -1 then map.NAXIS2=map.NAXIS2/4.
+	if (where(maptag eq 'cdelt1'))[0] ne -1 then map.CDELT1=map.index.CDELT1*4.
+	if (where(maptag eq 'cdelt2'))[0] ne -1 then map.CDELT2=map.index.CDELT2*4.
+	if (where(maptag eq 'naxis1'))[0] ne -1 then map.NAXIS1=map.index.NAXIS1/4.
+	if (where(maptag eq 'naxis2'))[0] ne -1 then map.NAXIS2=map.index.NAXIS2/4.
 	if not dodata then begin 
 		map.xc=map.xc/4.
 		map.yc=map.yc/4.
 		map.dx=map.dx*4.
 		map.dy=map.dy*4.
 		map.roll_center=map.roll_center/4.
+	endif
+	if where(maptag eq 'wcs') ne -1 then begin
+		map.wcs.naxis=map.wcs.naxis/4.
+		map.wcs.crpix=map.wcs.crpix/4.
+		map.wcs.cdelt=map.wcs.cdelt*4.
+;		map.wcs.crval=map.wcs.crval
+		cdelt
 	endif
 endif
 
@@ -42,14 +49,14 @@ if keyword_set(xy) then begin
 	xfrac=float(sz[0])/float(xy[0])
 	yfrac=float(sz[0])/float(xy[0])
 
-	if (where(maptag eq 'crpix1'))[0] ne -1 then map.CRPIX1=map.CRPIX1/xfrac
-	if (where(maptag eq 'crpix2'))[0] ne -1 then map.CRPIX2=map.CRPIX2/yfrac
+	if (where(maptag eq 'crpix1'))[0] ne -1 then map.index.CRPIX1=map.index.CRPIX1/xfrac
+	if (where(maptag eq 'crpix2'))[0] ne -1 then map.index.CRPIX2=map.index.CRPIX2/yfrac
 ;		index.CRVAL1=???
 ;		index.CRVAL2=???
-	if (where(maptag eq 'cdelt1'))[0] ne -1 then map.CDELT1=map.CDELT1*xfrac
-	if (where(maptag eq 'cdelt2'))[0] ne -1 then map.CDELT2=map.CDELT2*yfrac
-	if (where(maptag eq 'naxis1'))[0] ne -1 then map.NAXIS1=map.NAXIS1/xfrac
-	if (where(maptag eq 'naxis2'))[0] ne -1 then map.NAXIS2=map.NAXIS2/yfrac
+	if (where(maptag eq 'cdelt1'))[0] ne -1 then map.index.CDELT1=map.index.CDELT1*xfrac
+	if (where(maptag eq 'cdelt2'))[0] ne -1 then map.index.CDELT2=map.index.CDELT2*yfrac
+	if (where(maptag eq 'naxis1'))[0] ne -1 then map.index.NAXIS1=map.index.NAXIS1/xfrac
+	if (where(maptag eq 'naxis2'))[0] ne -1 then map.index.NAXIS2=map.index.NAXIS2/yfrac
 	if not dodata then begin 
 		map.xc=map.xc/xfrac
 		map.yc=map.yc/yfrac
@@ -57,25 +64,37 @@ if keyword_set(xy) then begin
 		map.dy=map.dy*yfrac
 		map.roll_center=map.roll_center/[xfrac,yfrac]
 	endif
+	if where(maptag eq 'wcs') ne -1 then begin
+		map.wcs.naxis=map.wcs.naxis/[xfrac,yfrac]
+		map.wcs.crpix=map.wcs.crpix/[xfrac,yfrac]
+		map.wcs.cdelt=map.wcs.cdelt*[xfrac,yfrac]
+;		map.wcs.crval=map.wcs.crval
+	endif
 endif
 
 if n_elements(reducexy) eq 2 then begin
 	data=reduce(map.data,reducexy[0],reducexy[1],/average)
 	
-	if (where(maptag eq 'crpix1'))[0] ne -1 then map.CRPIX1=map.CRPIX1/reducexy[0]
-	if (where(maptag eq 'crpix2'))[0] ne -1 then map.CRPIX2=map.CRPIX2/reducexy[1]
+	if (where(maptag eq 'crpix1'))[0] ne -1 then map.index.CRPIX1=map.index.CRPIX1/reducexy[0]
+	if (where(maptag eq 'crpix2'))[0] ne -1 then map.index.CRPIX2=map.index.CRPIX2/reducexy[1]
 ;		index.CRVAL1=???
 ;		index.CRVAL2=???
-	if (where(maptag eq 'cdelt1'))[0] ne -1 then map.CDELT1=map.CDELT1*reducexy[0]
-	if (where(maptag eq 'cdelt2'))[0] ne -1 then map.CDELT2=map.CDELT2*reducexy[1]
-	if (where(maptag eq 'naxis1'))[0] ne -1 then map.NAXIS1=map.NAXIS1/reducexy[0]
-	if (where(maptag eq 'naxis2'))[0] ne -1 then map.NAXIS2=map.NAXIS2/reducexy[1]
+	if (where(maptag eq 'cdelt1'))[0] ne -1 then map.index.CDELT1=map.index.CDELT1*reducexy[0]
+	if (where(maptag eq 'cdelt2'))[0] ne -1 then map.index.CDELT2=map.index.CDELT2*reducexy[1]
+	if (where(maptag eq 'naxis1'))[0] ne -1 then map.index.NAXIS1=map.index.NAXIS1/reducexy[0]
+	if (where(maptag eq 'naxis2'))[0] ne -1 then map.index.NAXIS2=map.index.NAXIS2/reducexy[1]
 	if not dodata then begin 
 		map.xc=map.xc/reducexy[0]
 		map.yc=map.yc/reducexy[1]
 		map.dx=map.dx*reducexy[0]
 		map.dy=map.dy*reducexy[1]
 		map.roll_center=map.roll_center/reducexy
+	endif
+	if where(maptag eq 'wcs') ne -1 then begin
+		map.wcs.naxis=map.wcs.naxis/reducexy
+		map.wcs.crpix=map.wcs.crpix/reducexy
+		map.wcs.cdelt=map.wcs.cdelt*reducexy
+;		map.wcs.crval=map.wcs.crval
 	endif
 endif
 

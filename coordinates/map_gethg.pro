@@ -2,7 +2,7 @@
 
 pro map_gethg, map, wcs=wcs, hglon=hglon, hglat=hglat
 
-if data_type(wcs) ne 8 then wcs=fitshead2wcs(map)
+if data_type(wcs) ne 8 then wcs=map.wcs ;fitshead2wcs(map.index)
 
 coord=wcs_get_coord(wcs)
 

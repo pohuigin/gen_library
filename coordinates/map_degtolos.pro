@@ -6,7 +6,7 @@
 ;					edgefudge = take off an extra half percent from the disk to get rid of limb effects
 function map_degtolos, map, wcs=wcs, offlimb=offlimb
 
-wcs=fitshead2wcs(map)
+wcs=map.wcs ;fitshead2wcs(map.index)
 coord=wcs_get_coord(wcs)
 xx=reform(coord[0,*,*])
 yy=reform(coord[1,*,*])
