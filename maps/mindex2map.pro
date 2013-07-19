@@ -20,6 +20,9 @@
 ;				NEST		- Instead of merging the FITS index with the MAP, nest the 
 ;							  index as a MAP keyword
 ;
+;				FORCEDATA	- Make sure to overwrite any dodgey data field that exists 
+;							  in the index structure already
+;
 ; OUTPUT:    
 ;   	    	MAP			- The output (Zarro) image map structure with a complete 
 ;							FITS header.  
@@ -39,13 +42,34 @@
 ;-
 ;---------------------------------------------------------------------->
 
-pro mindex2map, inindex, indata, outmap, quiet=quiet, nest=nest
+pro mindex2map, inindex, indata, outmap, quiet=quiet, nest=nest, oldway=oldway, forcedata=forcedata
 
 if keyword_set(quiet) then begin & doquiet1=1 & doquiet2=1 & endif else begin 
 	doquiet1=0 & doquiet2=0 & endelse
 
 data=indata
 index=inindex
+
+if keyword_set(oldway) then begin
+
+	index2map,index,data,map
+	
+	;Find if there are any overlapping tag names (keep the map one if overlap is found)
+	mtags=tag_names(map)
+	itags=tag_names(index)
+	
+	match,mtags,itags,wm,wi
+
+	;Run through and add tags one at a time to map (skipping if overlap is found)
+	for i=0,n_elements(itags)-1 do $
+		if (where(wi eq i))[0] eq -1 then map=create_struct(map,itags[i],index.(i))
+
+	if keyword_set(forcedata) then add_prop,map,data=data,/replace
+	
+	outmap=map
+	return
+
+endif
 
 wcs=fitshead2wcs(index)
 
@@ -57,9 +81,6 @@ itags=tag_names(index)
 
 match,mtags,itags,wm,wi
 
-;Run through and add tags one at a time to map (skipping if overlap is found)
-;for i=0,n_elements(itags)-1 do $
-;	if (where(wi eq i))[0] eq -1 then map=create_struct(map,itags[i],index.(i))
 
 ntag=n_elements(mtags)
 nitag=n_elements(itags)
@@ -113,6 +134,7 @@ endif else begin
 
 endelse
 
+if keyword_set(forcedata) then add_prop,map,data=data,/replace
 
 outmap=map
 
