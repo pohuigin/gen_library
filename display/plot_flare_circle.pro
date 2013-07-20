@@ -22,9 +22,16 @@ if not keyword_set(innframe) then nframe=5 else nframe=innframe
 if not keyword_set(instartframe) then startframe=-1 else startframe=instartframe
 if not keyword_set(incolor) then color=255 else color=incolor
 
-framefrac=thisframe/float(nframe)
+;framefrac=1-(thisframe-(startframe+1.)/float(nframe)
+;colorf=color*framefrac
 
-draw_circle,position[0],position[1],radius,color=color*framefrac, _extra=_extra
+if thisframe eq startframe then colorf=color*0.5
+if thisframe eq startframe+1 then colorf=color
+if thisframe eq startframe+2 then colorf=color*0.6
+if thisframe eq startframe+3 then colorf=color*0.3
+if thisframe eq startframe+4 then colorf=color*0.15
+
+draw_circle,position[0],position[1],radius,color=colorf, _extra=_extra
 
 
 
