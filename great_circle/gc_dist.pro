@@ -5,7 +5,12 @@
 ;Blonlat: second reference point on great circle (GC), [longitude, latitude] in degrees
 ;OutEqNode: output the location of the nearest equatorial node to the reference point in degrees
 ;OutADist: distance between reference point A and the equatorial node of the GC. in degrees
-function gc_dist, inalonlat, inblonlat, outeqnode=nlatlon, outadist=outda, outmid=outmid
+;NoNaN: where ALONLAT is equal to BLONLAT GC_DIST will return a NaN. To replace the NaNs with 0, set /NoNaN
+;
+;NOTES:
+; 
+
+function gc_dist, inalonlat, inblonlat, outeqnode=nlatlon, outadist=outda, outmid=outmid, nonan=nonan
 alonlat=float(inalonlat)
 isb=keyword_set(n_elements(inblonlat))
 if isb then blonlat=float(inblonlat)
@@ -61,7 +66,10 @@ outmid=mlonlat/!dtor
 ;stop
 
 
-
+if keyword_set(nonan) then begin
+   wnan=where(finite(dd) ne 1)
+   if wnan[0] ne -1 then dd[wnan]=0
+endif
 
 
 return,dd/!dtor

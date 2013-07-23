@@ -2,16 +2,19 @@
 
 ;Re-map images to a Lat-Lon grid
 ;setting NOREMAP just returns the averaged magnetogram and nothing else.
-function make_latlon_img, infiles, map=inmap, mag=setmag, posmag=setpos, negmag=setneg, $
+function make_latlon_img, infiles, map=inmap, auxmap=inauxmap, $
+	mag=setmag, posmag=setpos, negmag=setneg, $
 	euv=seteuv, tmid=tmid, logscale=logscale, missval=missval, $
 	latbin=latbin, lonbin=lonbin, lonbound=lonbound, latbound=latbound, $
 	setrebin=setrebin, rebinfact=rebinfact, dofilter=dofilter, $
-	outfluxmap=outfluxmap, outmask=projmask, outhg=hgcoord, outavgimg=avgimg, $
+	outfluxmap=outfluxmap, outmask=projmask, outhg=hgcoord, outavgimg=avgimg, outaux=outaux, $
 	noremap=noremap
 
-rsunmm=695.5 ;radius of sun in Mm
+rsunmm=wcs_rsun(units='Mm') ;695.5 ;radius of sun in Mm
 radpasec=2.*!pi/(360.*3600.)
 missval=-9999.
+
+if n_elements(inauxmap) eq 1 then auxmap=inauxmap
 
 if n_elements(inmap) gt 0 and data_type(inmap) eq 8 then begin
 
@@ -64,8 +67,11 @@ lat = replicate(1,projdim[0]) # (findgen(projdim[1])*latbin+projlim[2])
 projmask=fltarr(projdim[0],projdim[1])+1.
 
 ;Create World Coordinate System structure
-if data_type(inindex) ne 8 then wcs = fitshead2wcs( map_rot ) $
-	else wcs = fitshead2wcs( inindex )
+if where(strlowcase(tag_names(map_rot)) eq 'wcs') eq -1 then begin
+	if data_type(inindex) ne 8 then wcs = fitshead2wcs( map_rot.index ) $
+		else wcs = fitshead2wcs( inindex )
+endif else wcs=map_rot.wcs
+
 COORD = WCS_GET_COORD(WCS)
 
 ;Assume image rotation is 0 degrees
@@ -78,7 +84,7 @@ rr=(xx^(2.)+yy^(2.))^(.5)
 
 ;Get radius of Sun in arcsecs, particular to the data source
 dsunmm=wcs.position.DSUN_OBS/1d6 ;put dist. to sun in Mm
-rsunmm=WCS_RSUN(units='Mm') ;radius of sun in Mm
+;rsunmm=WCS_RSUN(units='Mm') ;radius of sun in Mm
 rsunasec=atan(rsunmm/dsunmm)/radpasec
 
 ;stop
@@ -119,6 +125,9 @@ if keyword_set(setrebin) then begin
 	;imgavgrb=rebin(imgavg,(wcs.naxis)[0],(wcs.naxis)[1])
 	imgavgrb=reduce(imgavg,binfactor,binfactor,/average,miss=missval)
 	if keyword_set(setmag) then fluxmaprb=reduce(fluxmap,binfactor,binfactor,/average,miss=missval)
+	
+	if n_elements(auxmap) eq 1 then auxmap.data=reduce(auxmap.data,binfactor,binfactor,/average,miss=missval)
+	
 endif else begin
 	imgavgrb=imgavg
 	if n_elements(fluxmap) eq 0 then fluxmap=imgavg
@@ -129,10 +138,13 @@ undefine,COORD
 ;Remap image to Lat-Lon grid 
 ;wcs_convert_to_coord, wcs, coord, ’HG’, lon, lat
 HGLN=lon & HGLT=lat
+
 WCS_CONVERT_TO_COORD, WCS, COORD, 'HG', HGLN, HGLT
 pixel = wcs_get_pixel( wcs, coord )
 proj = reform( interpolate( imgavgrb, pixel[0,*,*], pixel[1,*,*] ))
 if keyword_set(setmag) then fluxproj = reform( interpolate( fluxmaprb, pixel[0,*,*], pixel[1,*,*] ))
+
+if n_elements(auxmap) eq 1 then auximg = reform( interpolate( auxmap.data, pixel[0,*,*], pixel[1,*,*] ))
 
 hgcoord=[[[HGLN]],[[HGLt]]]
 
@@ -142,6 +154,9 @@ if wmiss[0] ne -1 then begin
 	proj[wmiss]=missval
 	projmask[wmiss]=0.
 	if keyword_set(setmag) then fluxproj[wmiss]=missval
+	
+	if n_elements(auxmap) eq 1 then auximg[wmiss]=missval
+	
 endif
 
 
@@ -151,6 +166,8 @@ endif
 ;OUTPUT MASK OF IMAGE AVERAGING
 
 ;OUTPUT N IMAGES FOR SLICE
+
+if n_elements(auxmap) eq 1 then outaux=auximg
 
 outproj=proj
 if keyword_set(setmag) then outfluxmap=fluxproj
