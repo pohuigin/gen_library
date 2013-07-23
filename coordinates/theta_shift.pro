@@ -1,6 +1,6 @@
 ;-------------------------------------------------------------------------->
 ;Make sure that longitudes run from 0-360
-function sw_theta_shift, inarr, n180to180=n180to180
+function theta_shift, inarr, n180to180=n180to180
 
 outarr=inarr
 
