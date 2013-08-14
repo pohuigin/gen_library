@@ -10,9 +10,10 @@
 
 pro bin_data_time, data, time, odata, otime, bin=bin, $
 	hour=hour, day=day, week=week, month=month, rotation=rotation, year=year, $
-	totaldat=totaldat, meandat=meandat, nanmiss=nanmiss, tstart=intstart
+	totaldat=totaldat, meandat=meandat, mediandat=mediandat, nanmiss=nanmiss, tstart=intstart, $
+	meanbindat=meanbindat, totbindat=totbindat, medianbindat=medianbindat
 
-if not keyword_set(totaldat) and not keyword_set(meandat) then meandat=1
+if not keyword_set(totaldat) and not keyword_set(meandat) and not keyword_set(mediandat) then meandat=1
 
 time1=time
 data1=data
@@ -52,13 +53,16 @@ for i=0,npts-1 do begin
 		wthistim=where(thistim eq utims[j])
 		if keyword_set(meandat) then thisdata[j] = mean(data1[wthisbin[wthistim]])
 		if keyword_set(totaldat) then thisdata[j] = total(data1[wthisbin[wthistim]])
+		if keyword_set(mediandat) then thisdata[j] = median(data1[wthisbin[wthistim]])
 
 	endfor
 	databin[i] = mean(thisdata)
+	if keyword_set(totbindat) then databin[i] = total(thisdata)
+	if keyword_set(medianbindat) then databin[i] = median(thisdata)
 end
 
 if n_elements(nanmiss) gt 1 then $
-	if (where(databin eq nanmiss))[0] then databin[where(databin eq nanmiss)]=nan
+	if (where(databin eq nanmiss))[0] ne -1 then databin[where(databin eq nanmiss)]=nan
 
 otime=timebin*bin+tstart
 odata=databin
