@@ -75,15 +75,16 @@ pro rothel2xy, hel_start, t_start, t_end, hel_end, xy_start, xy_end, $
   t_start  = arr2str( t_start, /trim )
   xy_start = strcompress( string( round( xy_start ) ), /re )
   t_end    = arr2str( t_end, /trim )
-  hel_end  = strcompress( string( round( hel_end ) ), /re )
+
+  hel_end  = strcompress( fix(round( hel_end )), /re )
   xy_end   = reform( strcompress( string( round( xy_end ) ), /re ) )
       
   if ( strmid( hel_end( 0), 0, 1 ) eq '-' ) then $
-       hel_end( 0 ) = 'S' + strmid( hel_end( 0 ), 1, 2 ) else $
-       hel_end( 0 ) = 'N' + hel_end( 0 )
+       hel_end( 0 ) = 'S' + string(strmid( hel_end( 0 ), 1, 2 ),form='(I02)') else $
+       hel_end( 0 ) = 'N' + string(hel_end( 0 ),form='(I02)')
   if ( strmid( hel_end(1 ), 0, 1 ) eq '-' ) then $
-       hel_end( 1 ) = 'E' + strmid( hel_end( 1 ), 1, 2 ) else $
-       hel_end( 1 ) = 'W' + hel_end( 1 )
+       hel_end( 1 ) = 'E' + string(strmid( hel_end( 1 ), 1, 2 ),form='(I02)') else $
+       hel_end( 1 ) = 'W' + string(hel_end( 1 ),form='(I02)')
   
   if ( keyword_set( print ) ) then begin
     print, ' ' 
