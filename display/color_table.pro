@@ -1,9 +1,9 @@
 pro color_table, minmax, x12,y12, left=left, right=right, top=top,bottom=bottom,title=title, rr=rr, gg=gg, bb=bb, log=log, $
 	shadowtext=shadowtext, vertical=vertical,color=incolor, nodata=noplotdata, charthick=incharthick, charsize=incharsize
 
-if n_elements(incharsize) ne 0 then charsize=1.4 else incharsize=charsize
+if n_elements(incharsize) ne 0 then charsize=incharsize else charsize=1.4
 
-if n_elements(incharthick) eq 0 then charthick=5 else charthick=incharthick
+if n_elements(incharthick) ne 0 then charthick=incharthick else charthick=5
 
 if n_elements(incolor) eq 0 then color=255 else color=incolor
 
