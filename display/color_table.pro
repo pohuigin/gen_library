@@ -1,11 +1,15 @@
+;flip_color = multiply color table image by -1 to make colors run the opposite way.
+
 pro color_table, minmax, x12,y12, left=left, right=right, top=top,bottom=bottom,title=title, rr=rr, gg=gg, bb=bb, log=log, $
-	shadowtext=shadowtext, vertical=vertical,color=incolor, nodata=noplotdata, charthick=incharthick, charsize=incharsize
+	shadowtext=shadowtext, vertical=vertical,color=incolor, nodata=noplotdata, charthick=incharthick, charsize=incharsize, flip_color=flip_color, _extra=_extra
 
 if n_elements(incharsize) ne 0 then charsize=incharsize else charsize=1.4
 
 if n_elements(incharthick) ne 0 then charthick=incharthick else charthick=5
 
 if n_elements(incolor) eq 0 then color=255 else color=incolor
+
+if keyword_set(flip_color) then negimg=-1. else negimg=1.
 
 if not keyword_set(noplotdata) then begin
 	tvlct,rr0,gg0,bb0,/get
@@ -28,7 +32,7 @@ if keyword_set(log) then thisoriginx=thisorigin  else thisoriginx=min0
 ;!p.position=[.5,.8,.8,.9]
 
 ;plot the color gradient
-if not keyword_set(noplotdata) then plot_image,ctarr[1:*,*],position=thispos,yticklen=.001,xticklen=.001,xtit='',ytit='',/noerase,xtickname=strarr(10)+' ',ytickname=strarr(10)+' '
+if not keyword_set(noplotdata) then plot_image,negimg*ctarr[1:*,*],position=thispos,yticklen=.001,xticklen=.001,xtit='',ytit='',/noerase,xtickname=strarr(10)+' ',ytickname=strarr(10)+' '
 
 ;stop
 
@@ -36,14 +40,14 @@ setcolors,/sys,/silent
 
 if not keyword_set(vertical) then begin
 	if keyword_set(shadowtext) then begin
-		plot,fltarr(100,100),yticklen=.001,ytickname=strarr(10)+' ',xtit=title,/noerase,charsize=1.4,position=thispos,xran=minmax,xticklen=1,xlog=log,color=!black,thick=2,charthick=4,/nodata
-		plot,fltarr(100,100),yticklen=.001,ytickname=strarr(10)+' ',xtit=title,/noerase,charsize=1.4,position=thispos,xran=minmax,xticklen=1,xlog=log,color=!white,thick=2,charthick=1.4,/nodata
-	endif else plot,fltarr(100,100),yticklen=.001,ytickname=strarr(10)+' ',xtit=title,/noerase,charsize=charsize,position=thispos,xran=minmax,xticklen=1,xlog=log,color=color,thick=2,charthick=charthick,/nodata;,xticks=2
+		plot,fltarr(100,100),yticklen=.001,ytickname=strarr(10)+' ',xtit=title,/noerase,charsize=1.4,position=thispos,xran=minmax,xticklen=1,xlog=log,color=!black,thick=2,charthick=4,/nodata,/xsty,/ysty
+		plot,fltarr(100,100),yticklen=.001,ytickname=strarr(10)+' ',xtit=title,/noerase,charsize=1.4,position=thispos,xran=minmax,xticklen=1,xlog=log,color=!white,thick=2,charthick=1.4,/nodata,/xsty,/ysty
+	endif else plot,fltarr(100,100),yticklen=.001,ytickname=strarr(10)+' ',xtit=title,/noerase,charsize=charsize,position=thispos,xran=minmax,xticklen=1,xlog=log,color=color,thick=2,charthick=charthick,/nodata,_extra=_extra,/xsty,/ysty;,xticks=2
 endif else begin
 	if keyword_set(shadowtext) then begin
-		plot,fltarr(100,100),xticklen=.001,xtickname=strarr(10)+' ',ytit=title,/noerase,charsize=1.4,position=thispos,yran=minmax,yticklen=1,ylog=log,color=!black,thick=2,charthick=4,/nodata
-		plot,fltarr(100,100),xticklen=.001,xtickname=strarr(10)+' ',ytit=title,/noerase,charsize=1.4,position=thispos,yran=minmax,yticklen=1,ylog=log,color=!white,thick=2,charthick=1.4,/nodata
-	endif else plot,fltarr(100,100),xticklen=.001,xtickname=strarr(10)+' ',ytit=title,/noerase,charsize=charsize,position=thispos,yran=minmax,yticklen=1,ylog=log,color=color,thick=2,charthick=charthick,/nodata;,xticks=2
+		plot,fltarr(100,100),xticklen=.001,xtickname=strarr(10)+' ',ytit=title,/noerase,charsize=1.4,position=thispos,yran=minmax,yticklen=1,ylog=log,color=!black,thick=2,charthick=4,/nodata,/xsty,/ysty
+		plot,fltarr(100,100),xticklen=.001,xtickname=strarr(10)+' ',ytit=title,/noerase,charsize=1.4,position=thispos,yran=minmax,yticklen=1,ylog=log,color=!white,thick=2,charthick=1.4,/nodata,/xsty,/ysty
+	endif else plot,fltarr(100,100),xticklen=.001,xtickname=strarr(10)+' ',ytit=title,/noerase,charsize=charsize,position=thispos,yran=minmax,yticklen=1,ylog=log,color=color,thick=2,charthick=charthick,/nodata,_extra=_extra,/xsty,/ysty;,xticks=2
 endelse
 
 ;plot_image,ctarr[1:*,*],yticklen=.001,ytickname=strarr(10)+' ',xtit=title,/noerase,charsize=2,position=thispos,origin=[thisoriginx,thisorigin],scale=thisscale,xticklen=1,xlog=log,/nodata,color=0;,xticks=2
