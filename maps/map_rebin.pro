@@ -37,7 +37,7 @@ if keyword_set(rebin1k) then begin
 		map.wcs.crpix=map.wcs.crpix/4.
 		map.wcs.cdelt=map.wcs.cdelt*4.
 ;		map.wcs.crval=map.wcs.crval
-		cdelt
+
 	endif
 endif
 
