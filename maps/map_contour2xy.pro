@@ -59,8 +59,8 @@ if keyword_set(doplot) then begin
       xx=path_xy[0,info1.offset:info1.offset+info1.n-1]
       yy=path_xy[1,info1.offset:info1.offset+info1.n-1]
 
-      xxd=path_xyd[0,info1.offset:info1.offset+info1.n-1]
-      yyd=path_xyd[1,info1.offset:info1.offset+info1.n-1]
+      xxd=xx*dx+xc ;path_xyd[0,info1.offset:info1.offset+info1.n-1]
+      yyd=yy*dy+yc ;path_xyd[1,info1.offset:info1.offset+info1.n-1]
 
       if keyword_set(datacoord) then begin
          xx=xxd
