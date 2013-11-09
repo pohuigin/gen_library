@@ -34,7 +34,7 @@ if n_elements(bin) lt 1 then begin
 	if n_elements(bin) lt 1 then bin=3600.*24.
 endif
 
-npts=floor(max(time1)/float(bin)) ;,/l64)
+npts=floor(max(time1)/float(bin))+1 ;,/l64)
 
 timebin=findgen(npts)
 databin=fltarr(npts)

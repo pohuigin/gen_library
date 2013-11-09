@@ -11,9 +11,15 @@
 ; 
 
 function gc_dist, inalonlat, inblonlat, outeqnode=nlatlon, outadist=outda, outmid=outmid, nonan=nonan
+
 alonlat=float(inalonlat)
 isb=keyword_set(n_elements(inblonlat))
 if isb then blonlat=float(inblonlat)
+
+wa0=where(alonlat eq 0)
+wb0=where(blonlat eq 0)
+if wa0[0] ne -1 then alonlat[wa0]=alonlat[wa0]+0.001
+if wb0[0] ne -1 then blonlat[wb0]=blonlat[wb0]+0.001
 
 ;A = pt 1, B = pt 2, P = N-pole of GC, N = closest equatorial node of GC to A
 

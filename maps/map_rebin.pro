@@ -3,7 +3,11 @@
 ;XY = array of new [X size, Y size] for the map.
 ;	If map size if an integer multiple of XY then REBIN() is used, otherwise CONGRID() is used 
 ;REBIN and CONGRID keywords can be fed through _EXTRA=_EXTRA
-;REDUCE = set to a 2 element array specifying the factor to reduce the image by
+;REDUCE = set to a 2 element array specifying the factor to reduce the image by (e.g., [2,2] will reduce the image size by a factor of 2)
+;
+;Notes:
+;		CAREFUL, setting /rebin1k and setting reduce=[nx,ny] appears to give you two different things, because one uses REBIN() nearest neighbor averaging, and the other uses REDUCE(,/average), some other kind of averaging...
+
 function map_rebin,inmap,indata,rebin1k=rebin1k,xy=xy, reduce=reducexy, _extra=_extra, $
 	newdata=data
 map=inmap

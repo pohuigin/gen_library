@@ -27,8 +27,8 @@ if not keyword_set(inverse) then begin
 
    endfor
 
-   hglat=reform(hglat)
-   hglon=reform(hglon)
+   hglat=float(reform(hglat))
+   hglon=float(reform(hglon))
 
 endif else begin
 
