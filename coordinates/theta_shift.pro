@@ -4,8 +4,8 @@ function theta_shift, inarr, n180to180=n180to180
 
 outarr=inarr
 
-if (where(inarr ge 360))[0] ne -1 then outarr[where(inarr ge 360)]=outarr[where(inarr ge 360.)]-360.
-if (where(inarr lt 0))[0] ne -1 then outarr[where(inarr lt 0)]=outarr[where(inarr lt 0.)]+360.
+if (where(inarr ge 360))[0] ne -1 then outarr[where(inarr ge 360)]=outarr[where(inarr ge 360)]-360.
+if (where(inarr lt 0))[0] ne -1 then outarr[where(inarr lt 0)]=outarr[where(inarr lt 0)]+360.
 
 ;stop
 
