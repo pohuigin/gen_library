@@ -17,6 +17,7 @@ if wb0[0] ne -1 then blonlat[wb0]=blonlat[wb0]+0.001
 alonlat=alonlat*!dtor
 blonlat=blonlat*!dtor
 
+;!!!Another fudge :(
 ;!!!try to correct for problem when determining angles when A and B are on either side of the equator
 lonshift=alonlat[0,*]
 

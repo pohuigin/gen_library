@@ -16,6 +16,8 @@ alonlat=float(inalonlat)
 isb=keyword_set(n_elements(inblonlat))
 if isb then blonlat=float(inblonlat)
 
+
+;!!! Another fudge!! :(
 wa0=where(alonlat eq 0)
 wb0=where(blonlat eq 0)
 if wa0[0] ne -1 then alonlat[wa0]=alonlat[wa0]+0.001
@@ -47,7 +49,7 @@ db=acos(cos(blonlat[0,*]-nlonlat[0,*])*cos(blonlat[1,*]))
 ;distance between the two points
 alatsign=alonlat[1,*]/abs(alonlat[1,*])
 blatsign=blonlat[1,*]/abs(blonlat[1,*])
-diffhemisign=alatsign*blatsign
+diffhemisign=alatsign*blatsign ;!!!! looks a bit dodge... was this a fudge??
 
 dd=abs(da-db*diffhemisign)
 
@@ -77,7 +79,16 @@ if keyword_set(nonan) then begin
    if wnan[0] ne -1 then dd[wnan]=0
 endif
 
+;Convert the distance to degrees
+dist=dd/!dtor
 
-return,dd/!dtor
+;!!!! Another fudge :(
+;When distances go above 180- they are wrong! 
+;appears to fix the problem, when you subtract the number from 360...
+
+wbad=where(dist gt 180)
+if wbad[0] ne -1 then dist[wbad]=360.-dist[wbad]
+
+return,dist
 
 end
