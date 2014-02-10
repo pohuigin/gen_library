@@ -5,13 +5,16 @@
 
 ;TSTART = time to start bins at
 
+;TOTALDAT = when multiple ARs on disk (same time stamp), add their properties together
+;TOTBINDAT = After binning AR properties together, add properties at different times (within the same bin) together; default is to take the mean
+
 ;temporally bin data (ie. sunspot number)
 ;returns average number of sunspots on disk during course of bin.
 
 pro bin_data_time, data, time, odata, otime, bin=bin, $
 	hour=hour, day=day, week=week, month=month, rotation=rotation, year=year, $
-	totaldat=totaldat, meandat=meandat, mediandat=mediandat, nanmiss=nanmiss, tstart=intstart, $
-	meanbindat=meanbindat, totbindat=totbindat, medianbindat=medianbindat
+	totaldat=totaldat, meandat=meandat, mediandat=mediandat, maxdat=maxdat, nanmiss=nanmiss, tstart=intstart, $
+	meanbindat=meanbindat, totbindat=totbindat, medianbindat=medianbindat, maxbindat=maxbindat
 
 if not keyword_set(totaldat) and not keyword_set(meandat) and not keyword_set(mediandat) then meandat=1
 
@@ -53,12 +56,14 @@ for i=0,npts-1 do begin
 		wthistim=where(thistim eq utims[j])
 		if keyword_set(meandat) then thisdata[j] = mean(data1[wthisbin[wthistim]])
 		if keyword_set(totaldat) then thisdata[j] = total(data1[wthisbin[wthistim]])
+		if keyword_set(maxdat) then thisdata[j] = max(data1[wthisbin[wthistim]])
 		if keyword_set(mediandat) then thisdata[j] = median(data1[wthisbin[wthistim]])
 
 	endfor
 	databin[i] = mean(thisdata)
 	if keyword_set(totbindat) then databin[i] = total(thisdata)
 	if keyword_set(medianbindat) then databin[i] = median(thisdata)
+	if keyword_set(maxbindat) then databin[i] = max(thisdata)
 end
 
 if n_elements(nanmiss) gt 1 then $
