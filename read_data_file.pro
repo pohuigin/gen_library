@@ -51,13 +51,33 @@ header=rawhead[whead]
 vararr='var'+strtrim(indgen(ncol),2)
 varstr=strjoin(vararr,',')
 
-readcolstr='readcol, file, '+varstr+', comment=''#'', format='''+format+''', delim='';'''
+;Determine if there are more than 30 columns in CSV file
+if ncol gt 30 then begin
+
+	varstr1=strjoin(vararr[0:29],',')
+	format1=strjoin((str_sep(format,','))[0:29],',')
+	readcolstr1='readcol, file, '+varstr1+', comment=''#'', format='''+format1+''', delim='';'''
+
+	varstr2=strjoin(vararr[30:*],',')
+	format2=strjoin(strarr(30)+'X',',')+','+strjoin((str_sep(format,','))[30:*],',')
+	readcolstr2='readcol, file, '+varstr2+', comment=''#'', format='''+format2+''', delim='';'''
+
+	status1=execute(readcolstr1)
+	status2=execute(readcolstr2)
+	status=strjoin([status1,status2],',')
+
+endif else begin
+
+	readcolstr='readcol, file, '+varstr+', comment=''#'', format='''+format+''', delim='';'''
 
 ;Read parameters from meta data file
-status=execute(readcolstr)
+	status=execute(readcolstr)
+
+endelse
 
 ;use execute to make an empty structure (with the tag names from the column names)
 ;blank='{'+strjoin(colnames+':'''',','')+'}'
+
 ;Create empty structure
 formarr=str_sep(format,',')
 

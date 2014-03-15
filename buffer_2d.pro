@@ -8,9 +8,9 @@ function buffer_2d,image,value=invalue,xs=inxs,ys=inys
 
 imgsz=size(image,/dim)
 
-if n_elements(inxs) ne 1 then xs=imgsz[0] else xs=inxs
+if n_elements(inxs) ne 1 then xs=imgsz[0] else xs=inxs > imgsz[0]
 
-if n_elements(inys) ne 1 then ys=imgsz[1] else ys=inys
+if n_elements(inys) ne 1 then ys=imgsz[1] else ys=inys > imgsz[1]
 
 if n_elements(invalue) ne 1 then value=0 else value=invalue
 

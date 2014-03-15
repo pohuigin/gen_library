@@ -15,7 +15,7 @@ end
 
 ;----------------------------------------------------------------------------->
 
-pro write_data_file, instruct, filecsv=infile, formstring=inform, header=inhead, append=append, nodata=nodata, noform=noform, notag=notag
+pro write_data_file, instruct, filecsv=infile, formstring=inform, header=inhead, append=append, nodata=nodata, noform=noform, notag=notag, _extra=_extra
 struct=instruct
 
 if n_elements(infile) eq 1 then file=infile else file='write_data_file'+time2file(systim(/utc),/sec)+'.txt'
@@ -49,7 +49,7 @@ endif
 if not keyword_set(nodata) then begin
 	for j=0l,n_elements(struct)-1l do begin
 	
-		thisline=struct2string(struct[j], inform=formstr)
+		thisline=struct2string(struct[j], inform=formstr, _extra=_extra)
 	
 		write_data_file_out, file, thisline
 	

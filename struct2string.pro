@@ -1,10 +1,12 @@
 ;Take a structure (or an array of structures) and convert it into a string or string array, 
 ;formatted to be easily read into a CSV file.
 
-function struct2string,instruct, formatstring=outform, inform=inform
+function struct2string,instruct, formatstring=outform, inform=inform, delim=indelim
 struct=instruct
 nstruct=n_elements(struct)
 stringarr=strarr(nstruct)
+
+if n_elements(indelim) eq 0 then delim=';' else delim=indelim
 
 if n_elements(inform) eq 1 then formstring=inform $
 	else formstring=struct2format(struct[0], typearr=typearr)
@@ -60,7 +62,7 @@ for i=0,nstruct-1 do begin
 	tagnums=strtrim(fix(findgen(ntags)),2)
 	
 	exstrarr='string(thisstruct.('+tagnums+'),form='''+strform+''')'
-	exstr='stringarr[i]=strjoin(['+strjoin(exstrarr,',')+'],'';'')'
+	exstr='stringarr[i]=strjoin(['+strjoin(exstrarr,',')+'],'''+delim+''')'
 	
 	status=execute(exstr)
 	
