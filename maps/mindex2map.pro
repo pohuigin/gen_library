@@ -75,6 +75,9 @@ wcs=fitshead2wcs(index)
 
 wcs2map,data,wcs,map
 
+;Use WCS determined time (why does MAP have wrong time?!?!)
+if where(strlowcase(tag_names(wcs.time)) eq 'corrected_date') ne -1 then map.time=anytim(wcs.time.CORRECTED_DATE,/vms)
+
 ;Find if there are any overlapping tag names (keep the map one if overlap is found)
 mtags=tag_names(map)
 itags=tag_names(index)

@@ -1,5 +1,5 @@
 ;input in arcsec
-;Use after running sun_map, when desired width is truncated by the
+;Use after running sub_map, when desired width is truncated by the
 ;limb
 ;This buffers out the width or height of the image to match the
 ;desired image size
