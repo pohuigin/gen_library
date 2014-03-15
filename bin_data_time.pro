@@ -4,6 +4,7 @@
 ;nanmiss=set to value for missing bins. routine will set these to NAN.
 
 ;TSTART = time to start bins at
+;OUTERR = output an array of STDEVs; 1 for each bin
 
 ;temporally bin data (ie. sunspot number)
 ;returns average number of sunspots on disk during course of bin.
@@ -11,7 +12,7 @@
 pro bin_data_time, data, time, odata, otime, bin=bin, $
 	hour=hour, day=day, week=week, month=month, rotation=rotation, year=year, $
 	totaldat=totaldat, meandat=meandat, mediandat=mediandat, nanmiss=nanmiss, tstart=intstart, $
-	meanbindat=meanbindat, totbindat=totbindat, medianbindat=medianbindat
+	meanbindat=meanbindat, totbindat=totbindat, medianbindat=medianbindat,outerr=outerr
 
 if not keyword_set(totaldat) and not keyword_set(meandat) and not keyword_set(mediandat) then meandat=1
 
@@ -38,6 +39,7 @@ npts=floor(max(time1)/float(bin))+1 ;,/l64)
 
 timebin=findgen(npts)
 databin=fltarr(npts)
+outerr=fltarr(npts)
 
 for i=0,npts-1 do begin
 	
@@ -56,6 +58,7 @@ for i=0,npts-1 do begin
 		if keyword_set(mediandat) then thisdata[j] = median(data1[wthisbin[wthistim]])
 
 	endfor
+	outerr[i] = stddev(thisdata)
 	databin[i] = mean(thisdata)
 	if keyword_set(totbindat) then databin[i] = total(thisdata)
 	if keyword_set(medianbindat) then databin[i] = median(thisdata)
