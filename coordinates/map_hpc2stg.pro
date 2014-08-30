@@ -18,7 +18,7 @@
 ;.r /archive/ssw/yohkoh/ucon/idl/mcallister/rect2pol.pro
 
 function map_hpc2stg, inmap, inrefimg, projlonlatcent=inprojllc, projscl=inprojscl, nan=innan, threshlon=inthreshlon, $
-	mask=mask,projmask=projmask, doprojscl=doprojscl, projpxscl=projpxscl, outrefproj=outrefproj, projlimbxy=projlimbxy, status=status
+	mask=mask,projmask=projmask, doprojscl=doprojscl, projpxscl=projpxscl, outrefproj=outrefproj, projlimbxy=projlimbxy, status=status, projmaxscale=projmaxscale
 	status=0
 map=inmap
 image=map.data
@@ -169,18 +169,37 @@ wins=where(finite(stgpxx) eq 1)
 winsx=stgpxx[wins]
 winsy=stgpxy[wins]
 
+;Determine the output projection size
+wxmax=float(max(winsx))
+wymax=float(max(winsy))
+if n_elements(projmaxscale) eq 1 then begin
+	if wxmax gt projmaxscale then begin
+		sclfrac=float(projmaxscale)/wxmax
+		projxmax=float(projmaxscale)
+		projymax=wymax/wxmax*float(projmaxscale)
+	endif else begin
+		sclfrac=1.
+		projxmax=wxmax
+		projymax=wymax		
+	endelse
+endif else begin
+	sclfrac=1.
+	projxmax=wxmax
+	projymax=wymax
+endelse
+
 
 ;Project and Interpolate the image
-stgproj = reform( WARP_TRI( winsx, winsy, (wins mod imgsz[0]), (wins/imgsz[0]), image,output_size=[max(winsx),max(winsy)]))
+stgproj = reform( WARP_TRI( winsx*sclfrac, winsy*sclfrac, (wins mod imgsz[0]), (wins/imgsz[0]), image,output_size=[projxmax,projymax]))
 
 ;Project the corresponding mask
-if n_elements(mask) gt 0 then projmask=reform( WARP_TRI( winsx, winsy, (wins mod imgsz[0]), (wins/imgsz[0]), mask, output_size=[max(winsx),max(winsy)])) ;
+if n_elements(mask) gt 0 then projmask=reform( WARP_TRI( winsx*sclfrac, winsy*sclfrac, (wins mod imgsz[0]), (wins/imgsz[0]), mask, output_size=[projxmax,projymax])) ;
 
 ;Project the corresponding input ref image
-if n_elements(inrefimg) gt 0 then outrefproj=reform( WARP_TRI( winsx, winsy, (wins mod imgsz[0]), (wins/imgsz[0]), inrefimg, output_size=[max(winsx),max(winsy)]))
+if n_elements(inrefimg) gt 0 then outrefproj=reform( WARP_TRI( winsx*sclfrac, winsy*sclfrac, (wins mod imgsz[0]), (wins/imgsz[0]), inrefimg, output_size=[projxmax,projymax]))
 
 if keyword_set(doprojscl) then begin
-	projrrdeg=reform( WARP_TRI( winsx, winsy, (wins mod imgsz[0]), (wins/imgsz[0]), rrdeg, output_size=[max(winsx),max(winsy)]))
+	projrrdeg=reform( WARP_TRI( winsx*sclfrac, winsy*sclfrac, (wins mod imgsz[0]), (wins/imgsz[0]), rrdeg, output_size=[projxmax,projymax]))
 	projpxscl=ar_losgrad(projrrdeg)*(2.*!pi*map.rsun/map.dx/360.)
 	projpxsclb=ar_buff(projpxscl, widthbuff=10, valbuff=0)
 	projpxsclb=smooth(projpxsclb,[5,5])

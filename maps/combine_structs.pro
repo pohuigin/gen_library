@@ -1,4 +1,4 @@
-pro combine_structs,str1,str2,strsum,structyp=structyp
+pro combine_structs,str1,str2,strsum,structyp=structyp, EXCEPT_TAGS=EXCEPT_TAGS
 ;+
 ; NAME:
 ;    COMBINE_STRUCTS
@@ -22,6 +22,9 @@ pro combine_structs,str1,str2,strsum,structyp=structyp
 ;     if already defined the program will crash.
 ;
 ; Author Dave Johnston UofM
+;
+; HISTORY:
+;	Automatically checks for repeated tags. Removes repeats from 2nd structure to avoid crash - P.A.Higgins - 3-Jul-2014
 ;-
 
 if n_params() LT 2 then begin 
@@ -36,6 +39,19 @@ if s1(1) ne s2(1) then begin
 	print,'structure sizes are different'
 	return
 endif
+
+
+;Automatically check for duplicate structure tags
+;remove duplicates from second structure, if necessary
+
+s1tags=tag_names(str1)
+s2tags=tag_names(str2)
+match,s1tags,s2tags,wm12,wm21
+if wm21[0] ne -1 then begin
+	remove_tags, str2, s1tags[wm21], str2sub
+	str2=str2sub
+endif
+
 
 str=create_struct(name=structyp,str1(0),str2(0))
 strsum=replicate(str,s1(1))

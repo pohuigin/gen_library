@@ -9,7 +9,7 @@
 ;
 ;Written: Paul A. Higgins - 20130725
 
-pro ffmpeg_img2mov, inglob, inoutmov, size=size, mov=movext, avi=aviext 
+pro ffmpeg_img2mov, inglob, inoutmov, size=size, mov=movext, avi=aviext, rate=inrate
 
 ;glob='./11158/minimovie/*.png'
 if n_elements(inglob) ne 1 then glob='./11158/movie/*.png' else glob=inglob
@@ -19,7 +19,8 @@ if keyword_set(movext) then ext='.mov'
 if keyword_set(aviext) then ext='.avi'
 if n_elements(ext) ne 1 then ext='.avi'
 
-spawn,'ffmpeg -f image2 -r 20 -pattern_type glob -i '''+glob+''' -b:v 20M '''+outmov+ext+'''',/sh
+if n_elements(inrate) ne 1 then rate='20' else rate=strtrim(fix(inrate),2)
+spawn,'ffmpeg -f image2 -r '+rate+' -pattern_type glob -i '''+glob+''' -b:v 20M '''+outmov+ext+'''',/sh
 
 
 

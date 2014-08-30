@@ -31,6 +31,7 @@ whead=where(strpos(rawhead,'#') eq 0)
 
 colnames=rawhead[max(whead)]
 colarr=strtrim(str_sep(strmid(colnames,1,strlen(colnames)-1),';'),2)
+colarr=colarr[where(colarr ne '')] 
 ncol=n_elements(colarr)
 
 wformat=(where(strpos(rawhead,'#FORMAT;') eq 0))[0]
@@ -51,15 +52,15 @@ header=rawhead[whead]
 vararr='var'+strtrim(indgen(ncol),2)
 varstr=strjoin(vararr,',')
 
-;Determine if there are more than 30 columns in CSV file
-if ncol gt 30 then begin
+;Determine if there are more than 24 columns in CSV file
+if ncol gt 25 then begin
 
-	varstr1=strjoin(vararr[0:29],',')
-	format1=strjoin((str_sep(format,','))[0:29],',')
+	varstr1=strjoin(vararr[0:24],',')
+	format1=strjoin((str_sep(format,','))[0:24],',')
 	readcolstr1='readcol, file, '+varstr1+', comment=''#'', format='''+format1+''', delim='';'''
 
-	varstr2=strjoin(vararr[30:*],',')
-	format2=strjoin(strarr(30)+'X',',')+','+strjoin((str_sep(format,','))[30:*],',')
+	varstr2=strjoin(vararr[25:*],',')
+	format2=strjoin(strarr(25)+'X',',')+','+strjoin((str_sep(format,','))[25:*],',')
 	readcolstr2='readcol, file, '+varstr2+', comment=''#'', format='''+format2+''', delim='';'''
 
 	status1=execute(readcolstr1)

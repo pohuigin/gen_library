@@ -13,7 +13,7 @@ if not keyword_set(silent) then print,[[' '],['Environment variables have been s
 psclose
 restore,'tmp_ct_store.sav'
 tvlct,rr,gg,bb
-spawn,'rm -rR tmp_ct_store.sav'
+spawn,'rm -rR tmp_ct_store.sav',/sh
 
 if not keyword_set(silent) then print,[[' '],['PostScript file closed.'],[' ']]
 
