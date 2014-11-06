@@ -10,7 +10,7 @@ tims=anytim(intims)
 ntims=n_elements(tims)
 clustind=fltarr(ntims)
 
-wts=flare_wait_time(tims)
+wts=flare_wait_time(tims) 
 
 wbreakclust=where(wts gt maxsep)
 nclust=n_elements(wbreakclust)
@@ -24,12 +24,10 @@ for i=0,nclust-1 do begin
 ;Fill the cluster index
 	clustind[wthisst:wthisen]=i
 
-	
-
 endfor
 
 ;fill the last cluster
-clustind[wbreakclust[nclust-1]:*]=nclust-1
+clustind[wbreakclust[nclust-1]:*]=max(clustind)+1
 
 return,clustind
 
